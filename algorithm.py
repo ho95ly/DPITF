@@ -34,7 +34,7 @@ def exact_recovery(tensor, tao, delt, ra, rb, rc, epsilon=10e-3, sample_number=0
         e1 = Pomega_tensor(a,b,c, tensor, tensor.shape,sample_number)
         e2 = Pomega_Pair(a,b,c, X, Y, Z, tensor.shape, sample_number)
         e = e1-e2
-        if (np.linalg.norm(e, ord=2)/np.linalg.norm(Pomega_tensor(a, b, c, tensor, tensor.shape, sample_number), ord=2) <= epsilon):
+        if (np.linalg.norm(e, ord=2)/np.linalg.norm(e1, ord=2) <= epsilon):
             print('########################################')
             break
 
