@@ -1,5 +1,4 @@
 import os,sys
-import tensorflow as tf
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
@@ -16,27 +15,28 @@ def exact_recovery(tensor, tensor_shape, r,delt,tao, epsilon=10e-3, sample_numbe
     If = []
 
     a, b, c = sample3D_rule(tensor.shape, sample_number)
+    sample_list=[a, b, c]
     # A, B, C = sample_rule4mat(tensor_shape, r, r, r, sample)
     #delt = 0.9 * sample_number/ np.sqrt(tensor_shape[0] * tensor_shape[1] * tensor_shape[2])
     #tao = 10 * np.sqrt(tensor_shape[0] * tensor_shape[1] * tensor_shape[2])
     fd = r * (tensor_shape[0] + tensor_shape[1]-r) + r * (tensor_shape[1] + tensor_shape[2] - r) + r * (tensor_shape[2] + tensor_shape[0]-r)
     print('degree of freedom:', fd)
-    print('delt:',delt)
+    print('delt:', delt)
     print('m/d:', sample_number/fd)
 
     for i in range(iteration_num):
 
-        X = shrink(adjoint_operator(a,b,c, y, tensor.shape, sample_number, 0), tao, mode='complicated')
-        Y = shrink(adjoint_operator(a,b,c, y, tensor.shape, sample_number, 1), tao, mode='normal')
-        Z = shrink(adjoint_operator(a,b,c, y, tensor.shape, sample_number, 2), tao, mode='normal')
+        X = shrink(adjoint_operator(sample_list, y, tensor.shape, sample_number, 0), tao, mode='complicated')
+        Y = shrink(adjoint_operator(sample_list, y, tensor.shape, sample_number, 1), tao, mode='normal')
+        Z = shrink(adjoint_operator(sample_list, y, tensor.shape, sample_number, 2), tao, mode='normal')
 
         X = X/np.sqrt(tensor.shape[2])
         Y = Y/np.sqrt(tensor.shape[0])
         Z = Z/np.sqrt(tensor.shape[1])
 
-        e1 = Pomega_tensor(a,b,c, tensor, tensor.shape,sample_number)
+        e1 = Pomega_tensor(sample_list, tensor, tensor.shape, sample_number)
         # e1 = Pomega_Pair(a,b,c, A, B, C, tensor_shape, sample_number)
-        e2 = Pomega_Pair(a,b,c, X, Y, Z, tensor.shape, sample_number)
+        e2 = Pomega_Pair(sample_list, X, Y, Z, tensor.shape, sample_number)
         e = e1-e2
 
         erate = np.linalg.norm(e, ord=2)/np.linalg.norm(e1, ord=2)

@@ -3,28 +3,15 @@ import os,sys
 import numpy as np
 import csv
 
-
-
-tensor = np.random.rand(8, 4, 5)*10
-mat = np.random.rand(80, 40)*10
-row = mat.shape[0]
-col = mat.shape[1]
-vecr1 = np.ones((row, 1))
-vecr2 = np.ones((col, 1))
-delta = np.matmul(np.matmul(np.transpose(vecr1),mat),vecr2)/np.sqrt(row*col)
-
-
 def generate(shape, rank):
     U = np.random.randn(shape[0], rank)
     V = np.random.randn(shape[1], rank)
     return U, V
 
-
 def centralization(mat):
     tmp = np.matmul(np.ones((mat.shape[0], mat.shape[0])), mat)/mat.shape[0]
     centermat = mat-tmp
     return centermat
-
 
 def subspace(shape, rank, mode=None):
     U, V = generate(shape, rank)
@@ -109,18 +96,21 @@ def adjoint_operator(spl, sample_vec, tensor_shape,m ,dim=None):# sample_vec[i]?
     if dim == 0:
         # sample_vec = Pomega_mat(a, b, c, mat, tensor_shape, m, 0)
         X = np.zeros((tensor_shape[0], tensor_shape[1]))
+        # print('X create')
         for i in range(m):
             X[spl[0][i]][spl[1][i]] = sample_vec[i]
         return X
     elif dim == 1:
         # sample_vec = Pomega_mat(a, b, c, mat, tensor_shape, m, 1)
         Y = np.zeros((tensor_shape[1], tensor_shape[2]))
+        # print('Y create')
         for i in range(m):
             Y[spl[1][i]][spl[2][i]] = sample_vec[i]
         return Y
     elif dim == 2:
         # sample_vec = Pomega_mat(a, b, c, mat, tensor_shape, m, 2)
         Z = np.zeros((tensor_shape[2], tensor_shape[0]))
+        # print('Z create')
         for i in range(m):
             Z[spl[2][i]][spl[0][i]] = sample_vec[i]
         return Z
@@ -129,15 +119,17 @@ def adjoint_operator(spl, sample_vec, tensor_shape,m ,dim=None):# sample_vec[i]?
         return -1
 
 
-def Pomega_tensor(spl, tensor, tensor_shape, sample_number):
+def Pomega_tensor(spl, tensor, sample_number):
     # a, b, c = sample3D_rule(tensor_shape, sample_number)
     # sample_t = np.zeros((sample_number, 1))
     sample_t = np.zeros(sample_number)
     for i in range(sample_number):
-        sample_t[i] = tensor[spl[0][i]][spl[1][i]][spl[2][i]]
+        for j in (tensor.shape[0]):
+            if tensor[j][0] == spl[0][i] and tensor[j][1] == spl[1][i] and tensor[j][2] == spl[2][i]:
+                sample_t[i] = tensor[j][3]
+                continue  # ??add continue or not?
     # print(sample_t)
     return sample_t
-
 
 def Pomega_Pair(spl, X, Y, Z, tensor_shape, m):
     Pomega_A = Pomega_mat(spl, X, tensor_shape, m, 0)
@@ -161,6 +153,7 @@ def cone_projection_operator(x, t):
 
 def SVT(mat, tao):
     u, s, v = np.linalg.svd(mat, full_matrices=True, compute_uv=True)
+    #print('svd done.')
     for i in range(len(s)):
         s[i]=max(0, s[i]-tao)
     # print(u, s, v)
@@ -179,10 +172,12 @@ def shrink(mat, mode='normal'):
 '''
 def shrink(mat, tao, mode='normal'):
         u,s,v = SVT(mat, tao)
+        #print('SVT done.')
         sm = np.zeros((u.shape[0], v.shape[0]))
         for i in range(len(s)):
             sm[i][i] = s[i]
         if mode == 'normal':
+            #print('normal svt done')
             return np.matmul(np.matmul(u, sm), v)
         if mode == 'complicated':
             vecr1 = np.ones((mat.shape[0], 1))
@@ -190,9 +185,8 @@ def shrink(mat, tao, mode='normal'):
             delta = np.matmul(np.matmul(np.transpose(vecr1), mat),vecr2)/np.sqrt(mat.shape[0]*mat.shape[1])
             tmp1 = np.matmul(np.matmul(u,sm),v)
             tmp2 = (max(0,delta-tao)+min(0,delta+tao))*np.ones((mat.shape))/np.sqrt(mat.shape[0]*mat.shape[1])
+            #print('complicated svt done')
             return tmp1+tmp2
-
-
 
 def shrinkageBorC(X_hat, tao, r):
     sum = 0
@@ -240,3 +234,7 @@ def shrinkageA(X_hat, tao, r):
     result = X + gamma*np.matmul(ones_vec1, ones_vec2)
 
     return result, r
+
+
+def show_result(tensor, X, Y, Z, spl,sample_num):
+    Pomega_tensor(spl, tensor, tensor.shape, sample_num)
