@@ -16,8 +16,14 @@ status = MPI.Status()
 root = 0
 FINISH = False
 
+<<<<<<< HEAD
 sample_number = 30000
 filename = 'data/qq.txt'
+=======
+
+sample_number = 50000
+filename = 'data/1.txt'
+>>>>>>> b95a6b8e197d362a8f4cd011187e2108bdb0ab90
 
 if comm_rank == 0:  # master
     num_workers = 3
@@ -28,10 +34,17 @@ if comm_rank == 0:  # master
     np.savetxt('data/e1.txt', e1,fmt='%.1f', delimiter='')
     #shape = tensor.shape
     # shape = get_rowdata_shape(filename)
+<<<<<<< HEAD
     shape = (6000, 300, 12)
     print('shape:',shape)
     rank = 10
     delt = 0.9 * sample_number/np.sqrt(shape[0] * shape[1] * shape[2])
+=======
+    shape = (7000, 200, 12)
+    print('shape:',shape)
+    rank = 10
+    delt = 3 * sample_number/np.sqrt(shape[0] * shape[1] * shape[2])
+>>>>>>> b95a6b8e197d362a8f4cd011187e2108bdb0ab90
     tao = 20 * np.sqrt(shape[0] * shape[1] * shape[2])
     # tao = 1700
     epsilon = 10e-3

@@ -48,9 +48,15 @@ def samplefromfile(filename, sp_num):
     while sp_num > 0:
         item = f.readline()
         item = item.split()
+<<<<<<< HEAD
         a.append(int(float(item[0])%6000))
         b.append(int(float(item[1])%300))
         c.append(int(float(item[2])%12))
+=======
+        a.append(int(item[0])%7000)
+        b.append(int(item[1])%200)
+        c.append(int(item[2])%12)
+>>>>>>> b95a6b8e197d362a8f4cd011187e2108bdb0ab90
         v.append(float(item[3]))
         sp_num -= 1
     sample_list = [a, b, c]
